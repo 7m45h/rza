@@ -14,7 +14,7 @@ $conn->exec(
 );
 
 $conn->exec(
-    "CREATE TABLE IF NOT EXISTS items (id INT UNIQUE NOT NULL, title TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL, note TEXT NOT NULL, owner TEXT NOT NULL)"
+    "CREATE TABLE IF NOT EXISTS items (id INT UNIQUE NOT NULL, title TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL, note TEXT NOT NULL, img TEXT NOT NULL, owner TEXT NOT NULL)"
 );
 
 ?>

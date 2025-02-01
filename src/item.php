@@ -56,24 +56,26 @@ function get_all($data, $conn)
             "category" => $row[2],
             "status" => $row[3] == "found",
             "note" => $row[4],
-            "owned" => $row[5] == $uname,
+            "img" => $row[5],
+            "owned" => $row[6] == $uname,
         ];
     }
 
     echo json_encode($resarr);
 }
 
-function insert_item($conn, $title, $category, $status, $note, $uname)
+function insert_item($conn, $title, $category, $status, $note, $img, $uname)
 {
     $id = time() . rand(0, 9);
 
-    $stmt = $conn->prepare("INSERT INTO items VALUES(?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO items VALUES(?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindParam(1, $id);
     $stmt->bindParam(2, $title);
     $stmt->bindParam(3, $category);
     $stmt->bindParam(4, $status);
     $stmt->bindParam(5, $note);
-    $stmt->bindParam(6, $uname);
+    $stmt->bindParam(6, $img);
+    $stmt->bindParam(7, $uname);
     $stmt->execute();
 
     return $id;
@@ -85,12 +87,21 @@ function add_item($data, $conn)
     $category = $data["category"];
     $status = $data["status"] ? "found" : "lost";
     $note = $data["note"];
+    $img = $data["img"];
     $token = $data["token"];
     $valid = validate_token($conn, $token);
 
     if ($valid) {
         $uname = uname_from_token($conn, $token);
-        $id = insert_item($conn, $title, $category, $status, $note, $uname);
+        $id = insert_item(
+            $conn,
+            $title,
+            $category,
+            $status,
+            $note,
+            $img,
+            $uname
+        );
 
         echo json_encode([
             "id" => $id,
@@ -98,6 +109,7 @@ function add_item($data, $conn)
             "category" => $category,
             "status" => $status,
             "note" => $note,
+            "img" => $img,
             "owned" => true,
         ]);
     } else {
