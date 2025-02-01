@@ -61,7 +61,7 @@ function add_user($conn, $uname, $pass)
     $stmt->execute();
 }
 
-function login($data, $conn)
+function signin($data, $conn)
 {
     $uname = $data["uname"];
     $pass = $data["pass"];
@@ -117,18 +117,23 @@ function auth_token($data, $conn)
         echo json_encode(["token" => ""]);
     }
 }
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    switch ($data["action"]) {
+        case "SIGNIN":
+            signin($data, $conn);
+            break;
 
-switch ($data["action"]) {
-    case "LOGIN":
-        login($data, $conn);
-        break;
+        case "SIGNUP":
+            signup($data, $conn);
+            break;
 
-    case "SIGNUP":
-        signup($data, $conn);
-        break;
-
-    case "TOKEN":
-        auth_token($data, $conn);
-        break;
+        case "TOKEN":
+            auth_token($data, $conn);
+            break;
+    }
+} else {
+    http_response_code(403);
+    echo json_encode(["token" => ""]);
 }
+
 ?>
