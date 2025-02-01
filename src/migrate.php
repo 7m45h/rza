@@ -1,4 +1,7 @@
 <?php
+include "cors.php";
+cors();
+
 $DB_URL = getenv("DBURI");
 
 $conn = new PDO($DB_URL);

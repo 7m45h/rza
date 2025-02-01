@@ -1,4 +1,6 @@
 <?php
+include "cors.php";
+
 $DB_URL = getenv("DBURI");
 
 $conn = new PDO($DB_URL);
@@ -9,6 +11,7 @@ if (!$conn) {
 $body = file_get_contents("php://input");
 $data = json_decode($body, true);
 
+cors();
 header("Content-Type: application/json; charset=utf-8");
 
 function validate_user($conn, $uname, $pass)
