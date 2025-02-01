@@ -66,7 +66,7 @@ function get_all($data, $conn)
 
 function insert_item($conn, $title, $category, $status, $note, $img, $uname)
 {
-    $id = time() . rand(0, 9);
+    $id = rand(0, 10000);
 
     $stmt = $conn->prepare("INSERT INTO items VALUES(?, ?, ?, ?, ?, ?, ?)");
     $stmt->bindParam(1, $id);
