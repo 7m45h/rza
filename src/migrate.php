@@ -12,7 +12,15 @@ if (!$conn) {
 $conn->exec(
     "CREATE TABLE IF NOT EXISTS users (uname TEXT UNIQUE NOT NULL, pass TEXT NOT NULL, token TEXT)"
 );
+$conn->exec("DROP TABLE users");
+$conn->exec(
+    "CREATE TABLE IF NOT EXISTS users (uname TEXT UNIQUE NOT NULL, pass TEXT NOT NULL, token TEXT)"
+);
 
+$conn->exec(
+    "CREATE TABLE IF NOT EXISTS items (id INT UNIQUE NOT NULL, title TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL, note TEXT NOT NULL, img TEXT NOT NULL, owner TEXT NOT NULL)"
+);
+$conn->exec("DROP TABLE items");
 $conn->exec(
     "CREATE TABLE IF NOT EXISTS items (id INT UNIQUE NOT NULL, title TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL, note TEXT NOT NULL, img TEXT NOT NULL, owner TEXT NOT NULL)"
 );
