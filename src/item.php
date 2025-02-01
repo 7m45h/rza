@@ -39,33 +39,31 @@ function get_all($data, $conn)
 {
     $token = $data["token"];
     $valid = validate_token($conn, $token);
+    $uname = "";
 
     if ($valid) {
         $uname = uname_from_token($conn, $token);
-
-        $stmt = $conn->prepare("SELECT * FROM items");
-        $stmt->execute();
-
-        $resarr = [];
-        foreach ($stmt as $row) {
-            $resarr[] = [
-                "id" => $row[0],
-                "title" => $row[1],
-                "category" => $row[2],
-                "situation" => $row[3],
-                "note" => $row[4],
-                "owned" => $row[5] == $uname,
-            ];
-        }
-
-        echo json_encode($resarr);
-    } else {
-        http_response_code(403);
-        echo json_encode([]);
     }
+
+    $stmt = $conn->prepare("SELECT * FROM items");
+    $stmt->execute();
+
+    $resarr = [];
+    foreach ($stmt as $row) {
+        $resarr[] = [
+            "id" => $row[0],
+            "title" => $row[1],
+            "category" => $row[2],
+            "status" => $row[3] == "found",
+            "note" => $row[4],
+            "owned" => $row[5] == $uname,
+        ];
+    }
+
+    echo json_encode($resarr);
 }
 
-function insert_item($conn, $title, $category, $situation, $note, $uname)
+function insert_item($conn, $title, $category, $status, $note, $uname)
 {
     $id = time() . rand(0, 9);
 
@@ -73,7 +71,7 @@ function insert_item($conn, $title, $category, $situation, $note, $uname)
     $stmt->bindParam(1, $id);
     $stmt->bindParam(2, $title);
     $stmt->bindParam(3, $category);
-    $stmt->bindParam(4, $situation);
+    $stmt->bindParam(4, $status);
     $stmt->bindParam(5, $note);
     $stmt->bindParam(6, $uname);
     $stmt->execute();
@@ -85,20 +83,20 @@ function add_item($data, $conn)
 {
     $title = $data["title"];
     $category = $data["category"];
-    $situation = $data["situation"];
+    $status = $data["status"] ? "found" : "lost";
     $note = $data["note"];
     $token = $data["token"];
     $valid = validate_token($conn, $token);
 
     if ($valid) {
         $uname = uname_from_token($conn, $token);
-        $id = insert_item($conn, $title, $category, $situation, $note, $uname);
+        $id = insert_item($conn, $title, $category, $status, $note, $uname);
 
         echo json_encode([
             "id" => $id,
             "title" => $title,
             "category" => $category,
-            "situation" => $situation,
+            "status" => $status,
             "note" => $note,
             "owned" => true,
         ]);
@@ -129,12 +127,16 @@ function delete_item($data, $conn)
 }
 
 switch ($_SERVER["REQUEST_METHOD"]) {
-    case "GET":
-        get_all($data, $conn);
-        break;
-
     case "POST":
-        add_item($data, $conn);
+        switch ($data["action"]) {
+            case "ADD":
+                add_item($data, $conn);
+                break;
+
+            case "GET":
+                get_all($data, $conn);
+                break;
+        }
         break;
 
     case "DELETE":
