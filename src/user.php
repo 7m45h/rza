@@ -120,6 +120,17 @@ function auth_token($data, $conn)
         echo json_encode(["token" => ""]);
     }
 }
+
+function deauth($data, $conn)
+{
+    $token = $data["token"];
+    $stmt = $conn->prepare("UPDATE users SET token = '' WHERE token = ?");
+    $stmt->bindParam(1, $token);
+    $stmt->execute();
+
+    echo json_encode(["token" => ""]);
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     switch ($data["action"]) {
         case "SIGNIN":
@@ -128,6 +139,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         case "SIGNUP":
             signup($data, $conn);
+            break;
+
+        case "DEAUTH":
+            deauth($data, $conn);
             break;
 
         case "TOKEN":
